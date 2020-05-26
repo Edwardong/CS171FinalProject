@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from collections import OrderedDict
 from request import Request
-from public import PORTS, NETWORK_PORT, N
+#from public import PORTS, NETWORK_PORT, N
 import socket
 
 class Client:
@@ -11,7 +11,7 @@ class Client:
     def __init__(self, pid):
         self.balances = [10] * N
         self.pid = pid
-        self.blockchain = []
+        self.blockchain = None
         self.local_clock = 0
         self.event_queue = OrderedDict()
         self.started = False
