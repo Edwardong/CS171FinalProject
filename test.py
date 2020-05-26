@@ -1,7 +1,8 @@
-from client import Client
+#from client import Client
 #from request import Request
 import queue
-from Util import *
+from BlockNode import BlockNode
+from BlockChain import BlockChain
 
 
 if __name__ == '__main__':
@@ -20,8 +21,19 @@ if __name__ == '__main__':
     # test BlockChain
     block_chain = BlockChain()
     first_block = BlockNode(1)
+    first_block.add_trans([1, 2, 5])
+    first_block.add_trans([1, 4, 8])
+    first_block.add_trans([1, 5, 7])
+    # a = str(first_block)
+    # print(a)
     second_block = BlockNode(2)
+    second_block.add_trans([2, 4, 9])
+    second_block.add_trans([2, 3, 8])
+    second_block.add_trans([2, 1, 6])
     third_block = BlockNode(3)
+    third_block.add_trans([3, 1, 2])
+    third_block.add_trans([3, 2, 11])
+    third_block.add_trans([3, 4, 62])
     block_chain.insert(first_block)
     block_chain.insert(second_block)
     #print(block_chain.head.test_int)
