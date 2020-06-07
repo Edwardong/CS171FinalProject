@@ -27,10 +27,10 @@ class BlockNode(object):
 
     def find_nonce(self):
         self.__nonce = "0"
-        attempt = hashlib.sha256(self.payload).hexdigest()
+        attempt = hashlib.sha256(pickle.dumps(self.payload)).hexdigest()
         while int(attempt[-1],16) > 4:
             self.__nonce = hex(int(self.__nonce,16) + 1)
-            attempt = hashlib.sha256(self.payload).hexdigest()
+            attempt = hashlib.sha256(pickle.dumps(self.payload)).hexdigest()
         return
 
     # @property

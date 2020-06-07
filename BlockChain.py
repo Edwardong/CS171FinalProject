@@ -4,6 +4,17 @@ import hashlib, pickle
 class BlockChain(object):
     def __init__(self, head=None):
         self.__head = head
+        #self.__depth = self.find_depth()
+
+    def find_depth(self):
+        if self.__head is None:
+            return 0
+        index = 1
+        dummy = self.__head
+        while dummy.prev is not None:
+            dummy = dummy.prev
+            index += 1
+        return index
 
     def insert(self, block):
         block.prev = self.head
@@ -34,6 +45,10 @@ class BlockChain(object):
     def head(self, new_head):
         self.__head = new_head
 
+    @property
+    def depth(self):
+        return self.find_depth()
+
     def __repr__(self):
         node = self.head
         nodes = []
@@ -44,10 +59,10 @@ class BlockChain(object):
         nodes.reverse()
         return " \n ↑ \n".join(nodes)
 
-    def save(self, pid):
-        # TODO:
-        pass 
-
-    def load(self):
-        # TODO:
-        pass 
+    # def save(self, pid):
+    #     # TODO:
+    #     pass
+    #
+    # def load(self):
+    #     # TODO:
+    #     pass
