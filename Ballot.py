@@ -21,4 +21,4 @@ class Ballot(object):
         return self
 
     def __str__(self):
-        return '< ' + str(self.seq_num) + '  ' + str(self.proc_id) + ' >'
+        return '< ' + str(self.seq_num) + '  ' + str(self.proc_id) + ' ' + str(self.depth) + ' >'

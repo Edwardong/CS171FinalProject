@@ -25,6 +25,9 @@ def processer(stop_signal):
                 paxos.set_proposel('value' + str(my_pid))
                 paxos.print()
                 paxos.send_prepare()
+
+            elif task['args'][0] == 'failProcess':
+                exit(0)
             
         elif task['type'] == 'msg-prepare':
             print('msg-prepare')
@@ -45,6 +48,8 @@ def processer(stop_signal):
         elif task['type'] == 'msg-decision':
             print('msg-decision')
             paxos.recv_decision(task)
+            # TODO: 
+
 
 
 if __name__ == '__main__':
