@@ -43,3 +43,11 @@ class BlockChain(object):
         nodes.append("NULL")
         nodes.reverse()
         return " \n ↑ \n".join(nodes)
+
+    def save(self, pid):
+        # TODO:
+        pass 
+
+    def load(self):
+        # TODO:
+        pass 
