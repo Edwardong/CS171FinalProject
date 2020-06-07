@@ -7,18 +7,25 @@ N = len(PORTS)
 PIDS = range(N)
 MAJORITY = N // 2 + 1
 
-delay = 0
+delay = 0.5
 
 
 def send_msg(receiver, msg):
     """ General purpose sender """
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('localhost', PORTS[receiver])) # safe
-        s.send(pickle.dumps(msg))
-    except Exception:
-        print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
-    # print("msg sent", msg)
+
+    def delay_send(receiver, msg, delay):
+        try:
+            time.sleep(delay)
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(('localhost', PORTS[receiver])) # safe
+            s.send(pickle.dumps(msg))
+        except Exception as e:
+            print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
+        # print("msg sent", msg)
+    
+    t = threading.Thread(target=delay_send, args=(receiver, msg, delay))
+    t.start()
+    
 
 
 def listener(port, stop_signal, task_queue):
