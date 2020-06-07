@@ -4,7 +4,7 @@ import queue
 import argparse
 import threading
 
-task_queue = queue.Queue() # task queue
+task_queue = queue.Queue() # event queue
 my_pid = -1
 paxos = None
 

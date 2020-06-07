@@ -1,27 +1,24 @@
 class Ballot(object):
-    def __init__(self, seq_num=0, proc_id=0,depth=0):
-        self.__seq_num = seq_num
-        self.__proc_id = proc_id
-        self.__depth = depth
+    def __init__(self, seq_num=0, proc_id=0, depth=0):
+        self.seq_num = seq_num
+        self.proc_id = proc_id
+        self.depth = depth
 
     def __lt__(self, other):
-        if self.__seq_num == other.seq_num:
-            return self.__proc_id < other.proc_id
+        if self.seq_num == other.seq_num:
+            return self.proc_id < other.proc_id
         else:
-            return self.__seq_num < other.seq_num
+            return self.seq_num < other.seq_num
 
-    @property
-    def seq_num(self):
-        return self.__seq_num
+    def next(self):
+        """ next ballot number (seq_num + 1) """
+        return Ballot(self.seq_num + 1, self.proc_id)
 
-    @seq_num.setter
-    def seq_num(self, new_seq_num):
-        self.__seq_num = new_seq_num
+    def update(self, other):
+        """ update so that >= other's seq_num """
+        if self.seq_num < other.seq_num:
+            self.seq_num = other.seq_num
+        return self
 
-    @property
-    def depth(self):
-        return self.depth
-
-    @depth.setter
-    def depth(self, depth):
-        self.depth = depth
+    def __str__(self):
+        return '< ' + str(self.seq_num) + '  ' + str(self.proc_id) + ' >'
