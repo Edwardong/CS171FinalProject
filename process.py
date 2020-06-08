@@ -44,7 +44,8 @@ def propose():
         proposed_block = createBlockNode(transaction_queue, chain.head)
         transaction_queue = []
         paxos.new_proposal(proposed_block)
-        paxos.print()
+        # paxos.print()
+        print('Created proposal with', len(proposed_block.transactions), 'transaction(s), ballotNum', paxos.my_proposal_bal)
     # else:
     #     print('Empty transaction queue.')
 
@@ -72,7 +73,7 @@ def processer(stop_signal):
                 break
         if not task_queue.empty():
             task = task_queue.get()
-            print('task:', str(task)[:60])
+            # print('task:', str(task)[:60])
 
         if task['type'] == 'console':
             if len(task['args']) == 0:
@@ -126,31 +127,31 @@ def processer(stop_signal):
                 print(transaction_queue)
             
         elif task['type'] == 'msg-prepare':
-            print('msg-prepare')
+            # print('msg-prepare')
             paxos.recv_prepare(task)
         
         elif task['type'] == 'msg-promise':
-            print('msg-promise')
+            # print('msg-promise')
             paxos.recv_promise(task)
 
         elif task['type'] == 'msg-accept':
-            print('msg-accept')
+            # print('msg-accept')
             paxos.recv_accept(task)
 
         elif task['type'] == 'msg-accepted':
-            print('msg-accepted')
+            # print('msg-accepted')
             paxos.recv_accepted(task)
 
         elif task['type'] == 'msg-decision':
-            print('msg-decision')
+            # print('msg-decision')
             paxos.recv_decision(task)
 
         elif task['type'] == 'chain-request':
-            print('chain-request')
+            # print('chain-request')
             send_msg(task['from'], {'type':'chain-reply', 'chain': chain})
 
         elif task['type'] == 'chain-reply':
-            print('chain-reply')
+            # print('chain-reply')
             received_chain = task['chain']
             if received_chain.depth > chain.depth:
                 # reset chain, paxos, queue
@@ -165,7 +166,7 @@ def processer(stop_signal):
 
 
 def on_inconsistent_depth(self, pid):
-    print('on_inconsistent_depth')
+    # print('on_inconsistent_depth')
     send_msg(pid, {'type': 'chain-request', 'from': my_pid})
 
 def on_decision(self, msg):
@@ -175,13 +176,13 @@ def on_decision(self, msg):
         on_inconsistent_depth(msg['bal'].proc_id)
         return
     # add to chain
-    print('on_decision')
+    # print('on_decision')
     schedule_interrupt = True
     chain.insert(msg['val'])
     # remove everything in proposed block and transaction queue
     transaction_queue = []
     proposed_block = None
-    print(chain)
+    # print(chain)
     print('Chain updated. All transactions in queue are discarded.')
     # if msg['val'] != proposed_block:
     #     print('Other node appended to the block chain. Local transaction queue deleted.')        

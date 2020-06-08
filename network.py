@@ -2,7 +2,8 @@ import pickle
 import socket, threading, time, random
 
 
-PORTS = [5000, 5001, 5002]
+PORTS = [5000, 5001, 5002, 5003, 5004]
+# PORTS = [5000, 5001, 5002]
 N = len(PORTS)
 PIDS = range(N)
 MAJORITY = N // 2 + 1
@@ -15,12 +16,12 @@ def link_off(pid):
     global link
     link[pid] = False
 
-delay = 0.5
+delay = 2.0
 def set_delay(new_delay):
     global delay
     delay = new_delay
     
-my_pid = 0
+my_pid = None
 def set_pid(pid):
     global my_pid
     my_pid = pid
@@ -39,7 +40,7 @@ def send_msg(receiver, msg):
             s.connect(('localhost', PORTS[receiver])) # safe
             s.send(pickle.dumps(msg))
         except Exception as e:
-            print(e)
+            # print(e)
             print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
         # print("msg sent to", receiver, msg)
 
@@ -67,7 +68,7 @@ def listener(port, stop_signal, task_queue):
             msg = pickle.loads(data)
             # print("msg received", msg)
             if not link[msg['SENDER']]:
-                print('Link with', receiver, 'is broken.')
+                # print('Link with', receiver, 'is broken.')
                 continue
             task = msg
             task_queue().put(task)

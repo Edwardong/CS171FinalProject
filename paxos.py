@@ -48,7 +48,7 @@ class Paxos:
                 
                 
     def recv_prepare(self, msg):
-        print("recv_prepare")
+        # print("recv_prepare")
         if msg['bal'].depth < self.depth:
             self.on_offer(self, msg['bal'].proc_id) # offer that node an update of blockchain
         if self.inconsistent_depth(msg['bal']):
@@ -74,7 +74,7 @@ class Paxos:
         val = msg['accepted_val']
         self.my_proposal_promises.append((bal, val))
         # if majority, move to ACCEPT phase
-        print(self.my_proposal_promises)
+        # print(self.my_proposal_promises)
         if self.my_proposal_phase == 'PREPARE' and len(self.my_proposal_promises) >= MAJORITY:
             self.my_proposal_phase = 'ACCEPT'
             # decide value
@@ -137,8 +137,8 @@ class Paxos:
         print('recv_decision')
         if self.inconsistent_depth(msg['bal']):
             return
-        print(msg['bal'])
-        print(msg['val'])
+        # print(msg['bal'])
+        # print(msg['val'])
         self.update_depth(self.depth + 1)
         self.on_decision(self, msg)
 
