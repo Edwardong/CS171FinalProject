@@ -82,12 +82,8 @@ def processer(stop_signal):
                 print(transaction_queue)
             
 
-            elif task['args'][0] == 'broadcast':
+            elif task['args'][0] == 'update': # debug
                 send_msg(int(task['args'][1]), {'type':'chain-reply', 'chain': chain})
-                # for pid in range(N):
-                #     if pid != my_pid:
-                #         send_msg(pid, {'type':'chain-reply', 'chain': pickle.dumps(chain)})
-
 
             elif task['args'][0] == 'failProcess':
                 return
@@ -141,7 +137,6 @@ def on_decision(self, msg):
     # TODO: check depth here
     # add to chain
     print('on_decision')
-    print(chain)
     chain.insert(msg['val'])
     print(chain)
     # remove everything in proposed block and transaction queue
