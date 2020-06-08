@@ -68,7 +68,7 @@ def processer(stop_signal):
                 trans = Transaction(sender, receiver, amount)
                 if sender == receiver:
                     print('Sender and receiver cannot be the same')
-                    break
+                    continue
                 # compute current balance after transactions in queue
                 current_balance = apply_transactions(copy(chain.balance), transaction_queue)
                 if apply_transactions(current_balance, [trans]):
@@ -134,10 +134,17 @@ def processer(stop_signal):
         save() #save after every task
 
 
+def on_inconsistent_depth(self, pid):
+    print('on_inconsistent_depth')
+    send_msg(pid, {'type': 'chain-request', 'from': my_pid})
+
+
 def on_decision(self, msg):
     # global proposed_block
     global chain
-    # TODO: check depth here
+    if msg['bal'].depth != chain.depth:
+        on_inconsistent_depth(msg['bal'].proc_id)
+        return
     # add to chain
     print('on_decision')
     chain.insert(msg['val'])
@@ -150,9 +157,12 @@ def on_decision(self, msg):
     #     transaction_queue = []
 
 
-def on_inconsistent_depth(self, pid):
-    print('on_inconsistent_depth')
-    send_msg(pid, {'type': 'chain-request', 'from': my_pid})
+def on_accept(self, msg):
+    # verify blockchain
+    block = msg['val']
+    return block.previous_hash == chain.head.hash \
+        and apply_transactions(chain.balance, block.transactions) \
+        and int(block.hash[-1],16) < 4
 
 
 if __name__ == '__main__':
@@ -176,6 +186,7 @@ if __name__ == '__main__':
     load()
     paxos.on_decision = on_decision
     paxos.on_inconsistent_depth = on_inconsistent_depth
+    paxos.on_accept = on_accept
 
     # Console thread
     while(True):

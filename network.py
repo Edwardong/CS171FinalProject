@@ -19,7 +19,6 @@ def send_msg(receiver, msg):
     """ General purpose sender """
 
     def delay_send(receiver, msg, delay):
-        print('delay:', delay)
         try:
             time.sleep(delay)
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -18,6 +18,7 @@ class Paxos:
     accepted_val = None
     on_decision = None # callback when 'decision' received
     on_invalid_depth = None
+    on_accept = None
 
     def __init__(self, pid):
         self.my_pid = pid
@@ -95,7 +96,7 @@ class Paxos:
     def recv_accept(self, msg):
         if self.inconsistent_depth(msg['bal']):
             return
-        if not msg['bal'] < self.latest_bal:
+        if not msg['bal'] < self.latest_bal and self.on_accept:
             self.accepted_bal = msg['bal']
             self.accepted_val = msg['val']
             self.latest_bal = msg['bal']
