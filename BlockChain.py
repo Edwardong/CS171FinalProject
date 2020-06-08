@@ -1,5 +1,5 @@
 import hashlib, pickle
-
+from Transaction import Transaction, apply_transactions
 
 class BlockChain(object):
     def __init__(self, head=None, n=1):
@@ -17,20 +17,17 @@ class BlockChain(object):
     def verify_insert_hash(self, block):
         # TODO:
         pass
-    
+
 
     def insert(self, block):
         """ Insert a block. Update balance and depth """
+        # update balance
+        if apply_transactions(self.balance, block.transactions) == False:
+            print('ERROR Cannot insert block: negative balance.')
+            return
         # attach block
         block.prev = self.head
-
         self.head = block
-        # update balance
-        for trans in block.transactions:
-            self.balance[trans.sender] -= trans.amount
-            self.balance[trans.receiver] += trans.amount
-            if trans.sender < 0:
-                print('ERROR in blockchain balance')
         # update depth
         self.depth += 1
 
@@ -43,11 +40,8 @@ class BlockChain(object):
         self.balance = [100.0] * self.N
         iter_node = self.head
         while iter_node is not None:
-            for trans in iter_node.transactions:
-                balance[trans.sender] -= trans.amount
-                balance[trans.receiver] += trans.amount
-                if trans.sender < 0:
-                    print('ERROR in blockchain balance')
+            if apply_transactions(self.balance, [iter_node.transactions]) == False:
+                print('ERROR Cannot insert block: negative balance.')
             self.depth += 1
             iter_node = iter_node.prev
 

@@ -10,3 +10,13 @@ class Transaction(object):
 
     def __repr__(self):
         return str(self.sender) + " pays " + str(self.receiver) + " " + str(self.amount) + " in " + str(self.timestamp)
+
+
+def apply_transactions(balance, transactions):
+    """ apply transactions: Transaction[] on balance: int[] """
+    for t in transactions:
+        balance[t.sender] -= t.amount
+        balance[t.receiver] += t.amount
+        if balance[t.sender] < 0:
+            return False
+    return balance
