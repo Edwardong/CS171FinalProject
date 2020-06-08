@@ -152,7 +152,7 @@ class Paxos:
         elif bal.depth > self.depth:
             # triggers a force update
             self.on_inconsistent_depth(self, bal.proc_id)
-            return True
+            return False
         else:
             return False
         

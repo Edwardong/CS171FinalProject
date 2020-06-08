@@ -83,7 +83,7 @@ def processer(stop_signal):
             
 
             elif task['args'][0] == 'broadcast':
-                send_msg(task['args'][1], {'type':'chain-reply', 'chain': chain})
+                send_msg(int(task['args'][1]), {'type':'chain-reply', 'chain': chain})
                 # for pid in range(N):
                 #     if pid != my_pid:
                 #         send_msg(pid, {'type':'chain-reply', 'chain': pickle.dumps(chain)})
@@ -122,11 +122,11 @@ def processer(stop_signal):
 
         elif task['type'] == 'chain-request':
             print('chain-request')
-            send_msg(task['from'], {'type':'chain-reply', 'chain': pickle.dumps(chain)})
+            send_msg(task['from'], {'type':'chain-reply', 'chain': chain})
 
         elif task['type'] == 'chain-reply':
             print('chain-reply')
-            received_chain = pickle.loads(task['chain'])
+            received_chain = task['chain']
             print(received_chain)
             if received_chain.depth > chain.depth:
                 chain = received_chain

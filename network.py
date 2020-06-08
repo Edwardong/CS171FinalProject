@@ -20,6 +20,7 @@ def send_msg(receiver, msg):
             s.connect(('localhost', PORTS[receiver])) # safe
             s.send(pickle.dumps(msg))
         except Exception as e:
+            print(e)
             print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
         print("msg sent to", receiver, msg)
     
