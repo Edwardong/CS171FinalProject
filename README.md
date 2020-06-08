@@ -38,3 +38,10 @@ Payload format:
 
 Event format
 `type, (foreign_clock,) (transaction,) (args,)`
+
+
+TODO:
+force update
+network delay
+load&save
+periodic propose

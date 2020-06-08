@@ -9,4 +9,4 @@ class Transaction(object):
         self.timestamp = datetime.datetime.now()
 
     def __repr__(self):
-        return str(self.sender) + " pays" + str(self.receiver) + " " + str(self.amount) + " in " + str(self.timestamp)
+        return str(self.sender) + " pays " + str(self.receiver) + " " + str(self.amount) + " in " + str(self.timestamp)

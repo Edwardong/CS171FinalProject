@@ -9,11 +9,13 @@ class Paxos:
     my_proposal_phase = 'PREPARE'
     my_proposal_bal = None
     my_proposal_val = None
-    my_proposal_promises = []
-    my_proposal_accept = 0
-    latest_bal = None
+    my_proposal_promises = [] # promises received from acceptors
+    my_proposal_accept = 0 # number of 'accpeted' received
+    my_proposal_value_accepted = True # whether my value is accepted, or I take other's accepted_val
+    latest_bal = None # the latest ballot number I've heard of
     accepted_bal = None
     accepted_val = None
+    on_decision = None # callback when 'decision' received
 
     def __init__(self, pid):
         self.my_pid = pid
@@ -21,16 +23,18 @@ class Paxos:
         self.accepted_bal = Ballot(0, 0, 0)
         self.accepted_val = None
 
-    def set_proposel(self, value):
+
+    def new_proposal(self, value):
+        # reset proposal variables
         self.my_proposal_phase = 'PREPARE'
         self.my_proposal_bal = Ballot(self.latest_bal.seq_num + 1, self.my_pid, self.depth) 
-        # latest_bal should update immediately afterwards
+        self.latest_bal = self.my_proposal_bal
         self.my_proposal_val = value
         self.my_proposal_promises = []
         self.my_proposal_accept = 0
-        
-        
-    def send_prepare(self):
+        self.my_proposal_value_accepted = True
+        print("========")
+        self.print()
         prepare_msg = {
             'type': 'msg-prepare',
             'bal': self.my_proposal_bal
@@ -38,15 +42,15 @@ class Paxos:
         for p in range(N):
             if p != self.my_pid:
                 send_msg(p, prepare_msg)
-            else:
-                self.recv_prepare(prepare_msg)
+        self.recv_prepare(prepare_msg)
+                
                 
 
     def recv_prepare(self, msg):
-        print("recv-prepare")
+        print("recv_prepare")
         # only promise a prepare msg if latest
-        if msg['bal'] > self.latest_bal:
-            sender = msg['bal'].proc_id
+        sender = msg['bal'].proc_id
+        if msg['bal'] > self.latest_bal or sender == self.my_pid: # patch as my latest_val updates with my proposal bal
             promise_msg = {
                 'type': 'msg-promise',
                 'accepted_bal': self.accepted_bal,
@@ -60,6 +64,7 @@ class Paxos:
 
 
     def recv_promise(self, msg):
+        print("recv_promise")
         bal = msg['accepted_bal']
         val = msg['accepted_val']
         self.my_proposal_promises.append((bal, val))
@@ -72,6 +77,7 @@ class Paxos:
             for bal, val in self.my_proposal_promises:
                 if val is not None and bal > max_bal:
                     self.my_proposal_val = val
+                    self.my_proposal_value_accepted = False
             # send 'accept' messages
             for p in PIDS:
                 accept_msg = {
@@ -123,14 +129,15 @@ class Paxos:
         print(msg['bal'])
         print(msg['val'])
         self.update_depth()
+        self.on_decision(self, msg)
 
 
     def update_depth(self):
-        """ start paxos for new depth: reset vars and """
+        """ start paxos for new depth: reset vars """
         self.depth += 1
-        latest_bal = None
-        accepted_bal = None
-        accepted_val = None
+        self.latest_bal = Ballot(0,0,self.depth)
+        self.accepted_bal = Ballot(0,0,self.depth)
+        self.accepted_val = None
 
 
     def inconsistent_depth(self, depth):
@@ -150,4 +157,6 @@ class Paxos:
         print('my_proposal_val: ', self.my_proposal_val)
         print('my_proposal_promises: ', self.my_proposal_promises)
         print('my_proposal_accept: ', self.my_proposal_accept)
-        print('latest_bal:', self.latest_bal)
+        print('latest_bal: ', self.latest_bal)
+        print('accepted_bal: ', self.accepted_bal)
+        print('accepted_val: ', self.accepted_val)
