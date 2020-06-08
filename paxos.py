@@ -103,6 +103,7 @@ class Paxos:
             sender = msg['bal'].proc_id
             accepted_msg = {
                 'type': 'msg-accepted',
+                'bal': msg['bal']
             }
             if sender != self.my_pid:
                 send_msg(sender, accepted_msg)
@@ -111,7 +112,8 @@ class Paxos:
 
 
     def recv_accepted(self, msg):
-        self.my_proposal_accept += 1
+        if msg['bal'] == self.my_proposal_bal:
+            self.my_proposal_accept += 1
         # majority
         if self.my_proposal_phase == 'ACCEPT' and self.my_proposal_accept >= MAJORITY:
             self.my_proposal_phase = 'DECISION'

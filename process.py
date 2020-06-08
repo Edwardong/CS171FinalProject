@@ -1,4 +1,4 @@
-from network import PORTS, N, send_msg, listener, delay
+from network import PORTS, N, send_msg, listener, set_delay
 from paxos import Paxos
 from BlockChain import BlockChain
 from BlockNode import BlockNode, createBlockNode
@@ -37,7 +37,7 @@ def load():
 
 def processer(stop_signal):
     """ Processer thread """
-    global chain, transaction_queue, proposed_block, send_msg
+    global chain, transaction_queue, proposed_block, send_msg, set_delay
     print("processing")
     while True:
         while task_queue.empty():
@@ -66,6 +66,9 @@ def processer(stop_signal):
                 receiver = int(task['args'][2])
                 amount = float(task['args'][3])
                 trans = Transaction(sender, receiver, amount)
+                if sender == receiver:
+                    print('Sender and receiver cannot be the same')
+                    break
                 # compute current balance after transactions in queue
                 current_balance = apply_transactions(copy(chain.balance), transaction_queue)
                 if apply_transactions(current_balance, [trans]):
@@ -88,7 +91,7 @@ def processer(stop_signal):
             elif task['args'][0] == 'failProcess':
                 return
             elif task['args'][0] == 'delay':
-                delay = float(task['args'][1])
+                set_delay(float(task['args'][1]))
             elif task['args'][0] == 'save':
                 save()
             elif task['args'][0] == 'load':

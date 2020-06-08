@@ -7,13 +7,19 @@ N = len(PORTS)
 PIDS = range(N)
 MAJORITY = N // 2 + 1
 
+# global delay
 delay = 0.5
 
+def set_delay(new_delay):
+    global delay
+    delay = new_delay
+    
 
 def send_msg(receiver, msg):
     """ General purpose sender """
 
     def delay_send(receiver, msg, delay):
+        print('delay:', delay)
         try:
             time.sleep(delay)
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -23,7 +29,7 @@ def send_msg(receiver, msg):
             print(e)
             print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
         # print("msg sent to", receiver, msg)
-    
+
     t = threading.Thread(target=delay_send, args=(receiver, msg, delay))
     t.start()
     
