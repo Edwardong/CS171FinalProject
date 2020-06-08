@@ -68,6 +68,10 @@ class BlockChain(object):
     def head(self, new_head):
         self.__head = new_head
 
+    @property
+    def depth(self):
+        return self.find_depth()
+
     def __repr__(self):
         node = self.head
         nodes = []

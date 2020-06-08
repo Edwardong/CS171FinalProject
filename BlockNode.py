@@ -36,19 +36,12 @@ class BlockNode(object):
 
 
     def find_nonce(self):
-        # self.__nonce = "0"
-        # payload = {
-        #     "Transactions": self.__transactions, 
-        #     "Nonce": self.__nonce
-        # }
-        # while int(hashlib.sha256(pickle.dumps(payload)).hexdigest()[-1], 16) > 4:
-        #     self.__nonce = hex(int(self.__nonce,16) + 1)
-        #     payload = {
-        #         "Transactions": self.__transactions, 
-        #         "Nonce": self.__nonce
-        #     }
-        # return
-        return '0'
+        self.__nonce = "0"
+        attempt = hashlib.sha256(pickle.dumps(self.payload)).hexdigest()
+        while int(attempt[-1],16) > 4:
+            self.__nonce = hex(int(self.__nonce,16) + 1)
+            attempt = hashlib.sha256(pickle.dumps(self.payload)).hexdigest()
+        return
 
     # @property
     # def base_hash_val(self):

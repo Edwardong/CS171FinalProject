@@ -1,5 +1,6 @@
 from network import PORTS, N, PIDS, MAJORITY, send_msg, listener
 from Ballot import Ballot
+import pickle
 
 
 class Paxos:
@@ -160,3 +161,8 @@ class Paxos:
         print('latest_bal: ', self.latest_bal)
         print('accepted_bal: ', self.accepted_bal)
         print('accepted_val: ', self.accepted_val)
+
+
+    def save_state(self):
+        with open("stored_state.txt", "wb") as f:
+            pickle.dump(self, f)

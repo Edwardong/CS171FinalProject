@@ -5,10 +5,13 @@ class Ballot(object):
         self.depth = depth
 
     def __lt__(self, other):
-        if self.seq_num == other.seq_num:
-            return self.proc_id < other.proc_id
+        if self.depth == other.depth:
+            if self.seq_num == other.seq_num:
+                return self.proc_id < other.proc_id
+            else:
+                return self.seq_num < other.seq_num
         else:
-            return self.seq_num < other.seq_num
+            return self.depth < other.depth
 
     def next(self):
         """ next ballot number (seq_num + 1) """
