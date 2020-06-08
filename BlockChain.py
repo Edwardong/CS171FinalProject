@@ -1,33 +1,50 @@
 import hashlib, pickle
-
+from Transaction import Transaction, apply_transactions
 
 class BlockChain(object):
-    def __init__(self, head=None):
+    def __init__(self, head=None, n=1):
+        """ Init a blockchain with n nodes """
         self.__head = head
-        #self.__depth = self.find_depth()
+        self.N = n
+        self.depth = 0 # it's okay not to encapsulate depth here cuz we have to maintain 'balance' anyhow so maintaining depth is just by-the-way
+        self.balance = [100.0] * n
 
-    def find_depth(self):
-        if self.__head is None:
-            return 0
-        index = 1
-        dummy = self.__head
-        while dummy.prev is not None:
-            dummy = dummy.prev
-            index += 1
-        return index
+
+    def verify_transaction(self, transaction):
+        return self.balance[transaction.sender] >= transaction.amount
+
+
+    def verify_insert_hash(self, block):
+        # TODO:
+        pass
+
 
     def insert(self, block):
+        """ Insert a block. Update balance and depth """
+        # update balance
+        if apply_transactions(self.balance, block.transactions) == False:
+            print('ERROR Cannot insert block: negative balance.')
+            return
+        # attach block
         block.prev = self.head
-        if block.prev is None:
-            block.previous_hash = '0000000000000000000000000000000000000000000000000000000000000000'
-        else:
-            payload = {
-                "Transaction": block.prev.transactions,
-                "Nonce": block.prev.nonce,
-                "Hash": block.prev.previous_hash
-            }
-            block.previous_hash = hashlib.sha256(pickle.dumps(payload)).hexdigest()
         self.head = block
+        # update depth
+        self.depth += 1
+
+
+    def rewrite(self, chain):
+        """ Rewrite the whole chain and update balance and depth """
+        self.__head = chain.head
+        # TODO: put chain to self.head
+        self.depth = 0
+        self.balance = [100.0] * self.N
+        iter_node = self.head
+        while iter_node is not None:
+            if apply_transactions(self.balance, [iter_node.transactions]) == False:
+                print('ERROR Cannot insert block: negative balance.')
+            self.depth += 1
+            iter_node = iter_node.prev
+
 
     def discard_last(self):
         if self.head is not None:
@@ -37,6 +54,7 @@ class BlockChain(object):
         self.discard_last()
         self.insert(block)
 
+
     @property
     def head(self):
         return self.__head
@@ -45,9 +63,9 @@ class BlockChain(object):
     def head(self, new_head):
         self.__head = new_head
 
-    @property
-    def depth(self):
-        return self.find_depth()
+    # @property
+    # def depth(self):
+    #     return self.find_depth()
 
     def __repr__(self):
         node = self.head
@@ -58,11 +76,3 @@ class BlockChain(object):
         nodes.append("NULL")
         nodes.reverse()
         return " \n ↑ \n".join(nodes)
-
-    # def save(self, pid):
-    #     # TODO:
-    #     pass
-    #
-    # def load(self):
-    #     # TODO:
-    #     pass

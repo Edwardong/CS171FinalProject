@@ -4,37 +4,29 @@ Jiaxi Ye && Zheren Dong
 
 Launch process:
 
-`$python3 process.py <pid=0|1|2>`
+`$python3 process.py <0~4>`
 
-`$python3 network.py`
+Commands:
 
-Input format:
+- `moneyTransfer <sender> <receiver> <amount>`  
+  shorthand `t`
+- `failLink <with>`
+- `fixLink <with>`
+- `failProcess`
+- `printBlockchain`  
+  shorthand `pc`
+- `printBalance`  
+  shorthand `pb`
+- `printQueue`  
+  shorthand `pq`
+- `printPaxos`  
+  shorthand `pp`
+- `delay <seconds>`
 
-- `print blockchain | clock | balance|set|pqueue`
+Commands for debugging:
+- `load`
+- `save`
+- `propose`  
+  shorthand `p`
+- `update <to>`
 
-- `transfer P<?> <amount>` 
-    
-  e.g. `transfer P2 5`
-
-  Or alternatively by pid: `transfer 1 5` 
-
-
-
-
-
-Message format:
-
-`sender, receiver, clock, payload`
-
-Payload format:
-
-`type: 'request'`
-
-`type: 'reply'`, 
-
-`type: 'release', transaction: [S,R,amount]`, 
-
-`type: 'test'`
-
-Event format
-`type, (foreign_clock,) (transaction,) (args,)`

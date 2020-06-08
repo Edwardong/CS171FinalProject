@@ -13,6 +13,9 @@ class Ballot(object):
         else:
             return self.depth < other.depth
 
+    def __eq__(self, other):
+        return self.seq_num == other.seq_num and self.proc_id == other.proc_id and self.depth == other.depth
+
     def next(self):
         """ next ballot number (seq_num + 1) """
         return Ballot(self.seq_num + 1, self.proc_id)
@@ -24,4 +27,4 @@ class Ballot(object):
         return self
 
     def __str__(self):
-        return '< ' + str(self.seq_num) + '  ' + str(self.proc_id) + ' ' + str(self.depth) + ' >'
+        return '< ' + str(self.seq_num) + ' ' + str(self.proc_id) + ' ' + str(self.depth) + ' >'
