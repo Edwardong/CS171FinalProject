@@ -34,8 +34,6 @@ class Paxos:
         self.my_proposal_promises = []
         self.my_proposal_accept = 0
         self.my_proposal_value_accepted = True
-        print("========")
-        self.print()
         prepare_msg = {
             'type': 'msg-prepare',
             'bal': self.my_proposal_bal
@@ -46,7 +44,6 @@ class Paxos:
         self.recv_prepare(prepare_msg)
                 
                 
-
     def recv_prepare(self, msg):
         print("recv_prepare")
         # only promise a prepare msg if latest
@@ -153,6 +150,7 @@ class Paxos:
         
         
     def print(self):
+        print("===================")
         print('my_pid:', self.my_pid)
         print('my_proposal_bal: ', self.my_proposal_bal)
         print('my_proposal_val: ', self.my_proposal_val)
@@ -161,8 +159,5 @@ class Paxos:
         print('latest_bal: ', self.latest_bal)
         print('accepted_bal: ', self.accepted_bal)
         print('accepted_val: ', self.accepted_val)
+        print("===================")
 
-
-    def save_state(self):
-        with open("stored_state.txt", "wb") as f:
-            pickle.dump(self, f)

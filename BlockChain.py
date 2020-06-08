@@ -14,14 +14,15 @@ class BlockChain(object):
         return self.balance[transaction.sender] >= transaction.amount
 
 
+    def verify_insert_hash(self, block):
+        # TODO:
+        pass
+    
+
     def insert(self, block):
         """ Insert a block. Update balance and depth """
         # attach block
         block.prev = self.head
-        if block.prev is None:
-            block.previous_hash = '0' * 64
-        else:
-            block.previous_hash = block.prev.hash()
 
         self.head = block
         # update balance

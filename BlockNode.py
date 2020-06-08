@@ -19,37 +19,26 @@ class BlockNode(object):
         self.__transactions.append(trans)
 
 
+    @property
     def hash(self):
         payload = {
             "Transaction": self.transactions,
             "Nonce": self.nonce,
-            "Hash": self.previous_hash
+            "Previous Hash": self.previous_hash
         }
         return hashlib.sha256(pickle.dumps(payload)).hexdigest()
 
     # def set_base_hash(self):
     #     self.__base_hash_val = hashlib.sha256(self.payload).hexdigest()
 
-
-
-
-
+        
 
     def find_nonce(self):
         self.__nonce = "0"
-        payload = {
-            "Transactions": self.__transactions,
-            "Nonce": self.__nonce
-        }
-        attempt = hashlib.sha256(pickle.dumps(payload)).hexdigest()
-        while int(attempt[-1],16) > 4:
+        while int(self.hash[-1],16) > 4:
             self.__nonce = hex(int(self.__nonce,16) + 1)
-            payload = {
-                "Transactions": self.__transactions,
-                "Nonce": self.__nonce
-            }
-            attempt = hashlib.sha256(pickle.dumps(payload)).hexdigest()
         return
+
 
     # @property
     # def base_hash_val(self):
@@ -111,13 +100,13 @@ class BlockNode(object):
         return table.get_string()
 
 
-def createBlockNode(transactions, previous_hash):
-    """ Create a blocknode based on $transactions$ and $previous_hash$, auto compute nonce """
+def createBlockNode(transactions, previous_block):
+    """ Create a blocknode based on $transactions$ and $previous_block$, auto compute nonce """
     b = BlockNode()
     # b.transactions = transactions
     for t in transactions:
         b.add_trans(t)
-    b.previous_hash = previous_hash
+    b.previous_hash = previous_block.hash if previous_block is not None else '0'*64
     b.find_nonce()
     return b
 
