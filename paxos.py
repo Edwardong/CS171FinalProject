@@ -19,6 +19,7 @@ class Paxos:
     on_decision = None # callback when 'decision' received
     on_invalid_depth = None
     on_accept = None
+    on_offer = None
 
     def __init__(self, pid):
         self.my_pid = pid
@@ -48,6 +49,8 @@ class Paxos:
                 
     def recv_prepare(self, msg):
         print("recv_prepare")
+        if msg['bal'].depth < self.depth:
+            self.on_offer(self, msg['bal'].proc_id) # offer that node an update of blockchain
         if self.inconsistent_depth(msg['bal']):
             return
         # only promise a prepare msg if latest
