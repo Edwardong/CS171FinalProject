@@ -13,7 +13,7 @@ class Transaction(object):
 
 
 def apply_transactions(balance, transactions):
-    """ apply transactions: Transaction[] on balance: int[] """
+    """ apply transactions: Transaction[] on balance: int[N] """
     for t in transactions:
         balance[t.sender] -= t.amount
         balance[t.receiver] += t.amount

@@ -26,20 +26,18 @@ def save():
     except:
         pass
 
-
 def load():
     global paxos, chain, transaction_queue
     try:
         with open("stored_state_" + str(my_pid) + ".state", "rb") as f:
             paxos, chain, transaction_queue = pickle.load(f)
     except Exception as e:
-        # print(e)
         pass
 
 
 def processer(stop_signal):
     """ Processer thread """
-    global transaction_queue, proposed_block
+    global chain, transaction_queue, proposed_block, send_msg
     print("processing")
     while True:
         while task_queue.empty():
@@ -47,7 +45,7 @@ def processer(stop_signal):
                 break
         if not task_queue.empty():
             task = task_queue.get()
-            print('task:', task)
+            print('task:', str(task)[:60])
 
         if task['type'] == 'console':
             if len(task['args']) == 0:
@@ -84,6 +82,13 @@ def processer(stop_signal):
                 print(transaction_queue)
             
 
+            elif task['args'][0] == 'broadcast':
+                send_msg(task['args'][1], {'type':'chain-reply', 'chain': chain})
+                # for pid in range(N):
+                #     if pid != my_pid:
+                #         send_msg(pid, {'type':'chain-reply', 'chain': pickle.dumps(chain)})
+
+
             elif task['args'][0] == 'failProcess':
                 return
             elif task['args'][0] == 'delay':
@@ -115,6 +120,18 @@ def processer(stop_signal):
             print('msg-decision')
             paxos.recv_decision(task)
 
+        elif task['type'] == 'chain-request':
+            print('chain-request')
+            send_msg(task['from'], {'type':'chain-reply', 'chain': pickle.dumps(chain)})
+
+        elif task['type'] == 'chain-reply':
+            print('chain-reply')
+            received_chain = pickle.loads(task['chain'])
+            print(received_chain)
+            if received_chain.depth > chain.depth:
+                chain = received_chain
+                paxos.update_depth(chain.depth)
+
         save() #save after every task
 
 
@@ -134,6 +151,10 @@ def on_decision(self, msg):
     #     print('Other node appended to the block chain. Local transaction queue deleted.')        
     #     transaction_queue = []
 
+
+def on_inconsistent_depth(self, pid):
+    print('on_inconsistent_depth')
+    send_msg(pid, {'type': 'chain-request', 'from': my_pid})
 
 
 if __name__ == '__main__':
@@ -156,6 +177,7 @@ if __name__ == '__main__':
     paxos = Paxos(my_pid)
     load()
     paxos.on_decision = on_decision
+    paxos.on_inconsistent_depth = on_inconsistent_depth
 
     # Console thread
     while(True):

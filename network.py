@@ -21,7 +21,7 @@ def send_msg(receiver, msg):
             s.send(pickle.dumps(msg))
         except Exception as e:
             print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
-        # print("msg sent", msg)
+        print("msg sent to", receiver, msg)
     
     t = threading.Thread(target=delay_send, args=(receiver, msg, delay))
     t.start()
@@ -42,9 +42,9 @@ def listener(port, stop_signal, task_queue):
         s.settimeout(2.0)
         try:
             c, addr = s.accept()
-            data = c.recv(1024)
+            data = c.recv(8192)
             msg = pickle.loads(data)
-            # print("msg received", msg)
+            print("msg received", msg)
             task = msg
             task_queue().put(task)
             c.close()

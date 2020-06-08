@@ -17,6 +17,7 @@ class Paxos:
     accepted_bal = None
     accepted_val = None
     on_decision = None # callback when 'decision' received
+    on_invalid_depth = None
 
     def __init__(self, pid):
         self.my_pid = pid
@@ -46,6 +47,8 @@ class Paxos:
                 
     def recv_prepare(self, msg):
         print("recv_prepare")
+        if self.inconsistent_depth(msg['bal']):
+            return
         # only promise a prepare msg if latest
         sender = msg['bal'].proc_id
         if msg['bal'] > self.latest_bal or sender == self.my_pid: # patch as my latest_val updates with my proposal bal
@@ -90,6 +93,8 @@ class Paxos:
     
     
     def recv_accept(self, msg):
+        if self.inconsistent_depth(msg['bal']):
+            return
         if not msg['bal'] < self.latest_bal:
             self.accepted_bal = msg['bal']
             self.accepted_val = msg['val']
@@ -124,26 +129,29 @@ class Paxos:
 
     def recv_decision(self, msg):
         print('recv_decision')
+        if self.inconsistent_depth(msg['bal']):
+            return
         print(msg['bal'])
         print(msg['val'])
-        self.update_depth()
+        self.update_depth(self.depth + 1)
         self.on_decision(self, msg)
 
 
-    def update_depth(self):
-        """ start paxos for new depth: reset vars """
-        self.depth += 1
+    def update_depth(self, new_depth):
+        """ restart paxos for new depth: reset vars """
+        self.depth = new_depth
         self.latest_bal = Ballot(0,0,self.depth)
         self.accepted_bal = Ballot(0,0,self.depth)
         self.accepted_val = None
 
 
-    def inconsistent_depth(self, depth):
-        if depth < self.depth:
+    def inconsistent_depth(self, bal):
+        if bal.depth < self.depth:
             # ignore this
             return True
-        elif depth > self.depth:
-            # TODO: triggers a force update
+        elif bal.depth > self.depth:
+            # triggers a force update
+            self.on_inconsistent_depth(self, bal.proc_id)
             return True
         else:
             return False
