@@ -7,16 +7,30 @@ N = len(PORTS)
 PIDS = range(N)
 MAJORITY = N // 2 + 1
 
-# global delay
-delay = 0.5
+link = [True] * N # network linkes
+def link_on(pid):
+    global link
+    link[pid] = True
+def link_off(pid):
+    global link
+    link[pid] = False
 
+delay = 0.5
 def set_delay(new_delay):
     global delay
     delay = new_delay
     
+my_pid = 0
+def set_pid(pid):
+    global my_pid
+    my_pid = pid
+
 
 def send_msg(receiver, msg):
     """ General purpose sender """
+    if not link[receiver]:
+        print('Link with', receiver, 'is broken.')
+        return
 
     def delay_send(receiver, msg, delay):
         try:
@@ -29,6 +43,7 @@ def send_msg(receiver, msg):
             print("Failed to send to process " + str(receiver) + "... but it doesn't matter!")
         # print("msg sent to", receiver, msg)
 
+    msg['SENDER'] = my_pid
     t = threading.Thread(target=delay_send, args=(receiver, msg, delay))
     t.start()
     
@@ -51,6 +66,9 @@ def listener(port, stop_signal, task_queue):
             data = c.recv(8192)
             msg = pickle.loads(data)
             # print("msg received", msg)
+            if not link[msg['SENDER']]:
+                print('Link with', receiver, 'is broken.')
+                continue
             task = msg
             task_queue().put(task)
             c.close()

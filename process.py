@@ -1,4 +1,4 @@
-from network import PORTS, N, send_msg, listener, set_delay
+from network import PORTS, N, send_msg, listener, set_delay, set_pid, link_on, link_off
 from paxos import Paxos
 from BlockChain import BlockChain
 from BlockNode import BlockNode, createBlockNode
@@ -110,6 +110,10 @@ def processer(stop_signal):
             elif task['args'][0] == 'update': # debug
                 send_msg(int(task['args'][1]), {'type':'chain-reply', 'chain': chain})
 
+            elif task['args'][0] == 'failLink':
+                link_off(int(task['args'][1]))
+            elif task['args'][0] == 'fixLink':
+                link_on(int(task['args'][1]))
             elif task['args'][0] == 'failProcess':
                 return
             elif task['args'][0] == 'delay':
@@ -148,7 +152,6 @@ def processer(stop_signal):
         elif task['type'] == 'chain-reply':
             print('chain-reply')
             received_chain = task['chain']
-            print(received_chain)
             if received_chain.depth > chain.depth:
                 # reset chain, paxos, queue
                 chain = received_chain
@@ -203,7 +206,7 @@ if __name__ == '__main__':
     parser.add_argument('pid', type=int)
     arg = parser.parse_args()
     my_pid = arg.pid
-
+    set_pid(my_pid) # network
 
     listener_thread_stop_signal = False
     listener_thread = threading.Thread(target=listener, args=(PORTS[my_pid], lambda: listener_thread_stop_signal, lambda: task_queue))
