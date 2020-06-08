@@ -6,7 +6,7 @@ class BlockChain(object):
         """ Init a blockchain with n nodes """
         self.__head = head
         self.N = n
-        self.depth = 0
+        self.depth = 0 # it's okay not to encapsulate depth here cuz we have to maintain 'balance' anyhow so maintaining depth is just by-the-way
         self.balance = [100.0] * n
 
 
@@ -68,9 +68,9 @@ class BlockChain(object):
     def head(self, new_head):
         self.__head = new_head
 
-    @property
-    def depth(self):
-        return self.find_depth()
+    # @property
+    # def depth(self):
+    #     return self.find_depth()
 
     def __repr__(self):
         node = self.head
